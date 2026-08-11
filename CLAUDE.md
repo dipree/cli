@@ -117,9 +117,10 @@ from the current repo's origin remote. It is visible in `entire help` and
 `agent-help` renders machine-readable, agent-facing usage live from the Cobra
 command tree (so it always matches the installed binary): bare prints a
 "when to use entire / which subcommand" map; `agent-help <command>` drills into
-one command's current flags; `--json` emits structured output. It is the single
-source of truth the first-turn context injection and the `--agent-help-skill`
-skill point agents at, instead of enumerating a surface that goes stale.
+one command's current flags; `--json` emits structured output. The optional
+`--agent-help-skill` points agents at this live output instead of enumerating a
+surface that goes stale. The separate first-turn context injection remains
+trail-specific and is emitted only when trails are enabled for the repo.
 Hidden commands opt into being advertised here by setting
 `Annotations[agentHelpAnnotation] = "true"` (e.g. `trail`). Because `agent-help`
 renders live and lists non-hidden commands, the experimental commands appear in

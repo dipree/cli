@@ -1199,13 +1199,15 @@ func TestHandleLifecycleTurnEnd_PrefersEventTokenUsage(t *testing.T) {
 
 type mockContextInjectorAgent struct {
 	mockLifecycleAgent
+	injections []agent.ContextInjection
 }
 
 var _ agent.ContextInjector = (*mockContextInjectorAgent)(nil)
 
 func (m *mockContextInjectorAgent) InjectionEvent() agent.EventType { return agent.TurnStart }
 
-func (m *mockContextInjectorAgent) RenderContextInjection(agent.ContextInjection) ([]byte, error) {
+func (m *mockContextInjectorAgent) RenderContextInjection(injection agent.ContextInjection) ([]byte, error) {
+	m.injections = append(m.injections, injection)
 	return nil, nil
 }
 
@@ -1239,6 +1241,7 @@ func TestHandleLifecycleTurnStart_ContextInjectionUnknownCacheDoesNotMarkDecided
 	require.NoError(t, err)
 	require.NotNil(t, state)
 	require.False(t, state.ContextInjectionDecided, "unknown/missing cache should not permanently suppress later injection")
+	require.Empty(t, ag.injections)
 }
 
 func TestHandleLifecycleTurnStart_ContextInjectionFreshTrueMarksDecided(t *testing.T) {
@@ -1267,6 +1270,36 @@ func TestHandleLifecycleTurnStart_ContextInjectionFreshTrueMarksDecided(t *testi
 	require.NoError(t, err)
 	require.NotNil(t, state)
 	require.True(t, state.ContextInjectionDecided, "fresh true cache should make a final injection decision")
+	require.Equal(t, []agent.ContextInjection{{Text: entireTrailContextInjection()}}, ag.injections)
+}
+
+func TestHandleLifecycleTurnStart_ContextInjectionFreshFalseDoesNotInject(t *testing.T) {
+	// Cannot use t.Parallel() because we use t.Chdir().
+	tmpDir := t.TempDir()
+	testutil.InitRepo(t, tmpDir)
+	testutil.WriteFile(t, tmpDir, "init.txt", "init")
+	testutil.GitAdd(t, tmpDir, "init.txt")
+	testutil.GitCommit(t, tmpDir, "init")
+	addGitHubOriginForLifecycleTest(t, tmpDir)
+	t.Chdir(tmpDir)
+	paths.ClearWorktreeRootCache()
+	session.ClearGitCommonDirCache()
+	require.NoError(t, saveTrailsEnabledForRepo(context.Background(), false))
+
+	ag := &mockContextInjectorAgent{mockLifecycleAgent: *newMockAgent()}
+	sessionID := "test-trail-inject-false"
+	scope, err := currentTrailEnablementScope(context.Background())
+	require.NoError(t, err)
+	require.NoError(t, saveTrailEnablementScopeHint(context.Background(), sessionID, scope))
+	event := &agent.Event{Type: agent.TurnStart, SessionID: sessionID, Prompt: "hello", Timestamp: time.Now()}
+
+	require.NoError(t, handleLifecycleTurnStart(context.Background(), ag, event))
+
+	state, err := strategy.LoadSessionState(context.Background(), sessionID)
+	require.NoError(t, err)
+	require.NotNil(t, state)
+	require.True(t, state.ContextInjectionDecided, "fresh false cache should make a final injection decision")
+	require.Empty(t, ag.injections, "trails-disabled repos must not receive trail context")
 }
 
 func TestHandleLifecycleTurnStart_RecordsGenericSkillSlashEvent(t *testing.T) {

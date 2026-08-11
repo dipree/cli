@@ -17,7 +17,6 @@ import (
 	"slices"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/entireio/cli/cmd/entire/cli/agent"
 	"github.com/entireio/cli/cmd/entire/cli/agent/codex"
@@ -316,10 +315,9 @@ func sessionStartMessage(agentName types.AgentName, emptyRepo bool) string {
 // agentHelpBannerSuffix returns the SessionStart banner suffix that points an
 // agent at `entire agent-help`. It targets Factory AI Droid, which is banner-only
 // — no model-context injection and no agent-help skill file — so the SessionStart
-// banner is its sole in-session channel for the pointer. Every other agent gets
-// the pointer via context injection (Claude/Codex/Gemini/OpenCode/Pi), a skill
-// file (Claude/Codex/Gemini), or the passive `entire status` surface
-// (Cursor/Copilot), so this returns "" for them to avoid a duplicate pointer.
+// banner is its sole in-session channel for the pointer. Other agents can discover
+// agent-help through an optional skill file or passive surfaces such as `entire
+// help` and `entire status`; their model-context injection is trail-specific.
 func agentHelpBannerSuffix(agentName types.AgentName) string {
 	if agentName == agent.AgentNameFactoryAIDroid {
 		return fmt.Sprintf("\n  Run `%s` to see entire's commands and flags.", agentHelpCommand)
@@ -450,38 +448,12 @@ func normalizeToolUsePaths(files []string, eventCWD, repoRoot string) []string {
 
 // handleLifecycleTurnStart handles turn start: captures pre-prompt state,
 // ensures strategy setup, initializes session.
-// entireTrailContextInjection is the one-time, model-facing pointer Entire
-// injects on the first turn of a session. It points at `entire agent-help` for
-// the full flag/subcommand surface — fetched on demand so that surface never goes
-// stale here as it grows — and adds only a small, stable behavioral invariant an
-// agent must know even if it never drills in: commits auto-capture checkpoints,
-// the two stable query anchors (`why`, `checkpoint search`) for recovering intent
-// before edits, and that setup/destructive commands belong to the user. It also
-// names the auto-detected repo (from the already-loaded session scope, no IO) and
-// the standing rule that the agent is inside the repo and must never ask the user
-// for the repo name. Kept terse: it costs context-window tokens on the first turn
-// of every session.
-func entireTrailContextInjection(scope trailEnablementScope) string {
-	repo := ""
-	if scope.Forge != "" && scope.Owner != "" && scope.Repo != "" {
-		repo = trailEnablementRepoKey(scope.Forge, scope.Owner, scope.Repo)
-	}
-	var b strings.Builder
-	b.WriteString("Entire is enabled for this repo. Run `entire agent-help` to see what entire does and which subcommand to use, then `entire agent-help <command>` for that command's exact, current flags. ")
-	b.WriteString("Commits automatically capture the AI session as a checkpoint, so never create checkpoints by hand — just commit normally. Before large edits, `entire why <file>:<line>` and `entire checkpoint search` recover the intent behind existing code. Leave setup and destructive commands (enable, disable, clean, rewind, auth) to the user. ")
-	// Mirror agentHelpRepoBlock's defense-in-depth: this string is injected raw
-	// into the agent's model context (no escaping), so a repo key carrying control
-	// characters (e.g. an <sessionID>.trail-scope.json cache written by a pre-fix
-	// binary, or tampered) degrades to the generic message rather than reaching
-	// that sink.
-	if repo != "" && strings.IndexFunc(repo, unicode.IsControl) < 0 {
-		b.WriteString("This repo is auto-detected from the git origin remote as ")
-		b.WriteString(repo)
-		b.WriteString("; you are already inside it, so never ask the user for the repo name.")
-	} else {
-		b.WriteString("Entire auto-detects the repo from the git origin remote, so never ask the user for the repo name.")
-	}
-	return b.String()
+// entireTrailContextInjection is the one-time, model-facing documentation Entire
+// injects to teach the agent the `entire trail` command. Kept terse: it costs
+// context-window tokens on the first turn of every session, and states no
+// transient fact (whether a trail exists can change at any time).
+func entireTrailContextInjection() string {
+	return "Trails are Entire's replacement for pull requests and issues. A trail ties together a branch's context, discussion, findings, and review state. Use `entire trail` to view, create, update, or watch one."
 }
 
 // emitContextInjection writes ag's native context-injection payload to stdout
@@ -538,7 +510,7 @@ func emitContextInjection(ctx context.Context, ag agent.Agent, event *agent.Even
 		return
 	}
 
-	payload, err := injector.RenderContextInjection(agent.ContextInjection{Text: entireTrailContextInjection(scope)})
+	payload, err := injector.RenderContextInjection(agent.ContextInjection{Text: entireTrailContextInjection()})
 	if err != nil {
 		logging.Warn(logCtx, "failed to render context injection",
 			slog.String("error", err.Error()))

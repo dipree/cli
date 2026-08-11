@@ -11,9 +11,9 @@ import (
 
 // Factory AI Droid is banner-only (no context injection, no agent-help skill
 // file), so it is the one built-in agent that gets the agent-help pointer
-// appended to its SessionStart banner. Every other agent already receives the
-// pointer via context injection or a skill file, or relies on the passive
-// `entire status` surface, so none of them get a duplicate banner pointer.
+// appended to its SessionStart banner. Other agents can use an optional skill
+// file or passive surfaces such as `entire help` and `entire status`; their
+// model-context injection is trail-specific.
 func TestAgentHelpBannerSuffix(t *testing.T) {
 	t.Parallel()
 
