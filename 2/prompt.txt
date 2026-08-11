@@ -1,0 +1,13 @@
+is the posthog mcp installed?
+
+---
+
+install datadog and posthog
+
+---
+
+How does it work with posthog?
+
+---
+
+I don't want to send shit to posthog, I want to use the fucking posthog mcp! HOW?

@@ -3,7 +3,7 @@
   "checkpoint_id": "01KZS47RZ6CA35EC4DCHA9PAZ8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 6,
+  "checkpoints_count": 10,
   "files_touched": [
     "CLAUDE.md",
     "cmd/entire/cli/agent_help_banner_test.go",
@@ -26,13 +26,20 @@
       "compact_transcript": "/1/transcript.jsonl",
       "content_hash": "/1/content_hash.txt",
       "prompt": "/1/prompt.txt"
+    },
+    {
+      "metadata": "/2/metadata.json",
+      "transcript": "/2/full.jsonl",
+      "compact_transcript": "/2/transcript.jsonl",
+      "content_hash": "/2/content_hash.txt",
+      "prompt": "/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 139369,
+    "input_tokens": 243230,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 1973248,
-    "output_tokens": 14046,
-    "api_call_count": 51
+    "cache_read_tokens": 2515456,
+    "output_tokens": 19746,
+    "api_call_count": 72
   }
 }
