@@ -1,9 +1,1 @@
-First, let's have a look at the session prompt injection which recommends to use agent-help.
-
----
-
-remove the existing prompt and replace it what was there before. Only about trails and only if it's enabled for that repo.
-
----
-
-Let's phrase it a little more around what it actually does, it's entire's replacement for PRs and issues.
+Commit and push
