@@ -1,0 +1,9 @@
+Have a look at the CLI posthog usage. Which commands are used and which not? Tell me.
+
+---
+
+Usage per command please with %
+
+---
+
+You don't have mcp posthog access?
