@@ -1,0 +1,67 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "01KZS47RZ6CA35EC4DCHA9PAZ8",
+  "session_id": "019ff22a-2f4a-7d80-95af-28f0898098db",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-11T19:19:27.100611Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 2,
+  "files_touched": [
+    "CLAUDE.md",
+    "cmd/entire/cli/agent_help_banner_test.go",
+    "cmd/entire/cli/lifecycle.go",
+    "cmd/entire/cli/lifecycle_test.go",
+    "cmd/entire/cli/trail_injection_controlchar_test.go",
+    "cmd/entire/cli/trail_injection_text_test.go"
+  ],
+  "agent": "Pi",
+  "model": "gpt-5.6-sol",
+  "turn_id": "af8ac789b3d5",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 76266,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1323008,
+    "output_tokens": 8860,
+    "api_call_count": 34
+  },
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-08-11T19:19:27.082348Z",
+    "agent_lines": 58,
+    "agent_removed": 124,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 58,
+    "total_lines_changed": 182,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 58,
+      "agent_lines_removed": 124
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 58,
+      "agent_lines_removed": 124
+    }
+  ]
+}
